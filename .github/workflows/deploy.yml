@@ -1,4 +1,4 @@
-name: Deploy edgetunnel to Cloudflare Workers
+name: Deploy edgegate to Cloudflare Workers
 
 on:
   push:
@@ -15,6 +15,15 @@ jobs:
 
       - name: Install Wrangler
         run: npm install -g wrangler
+
+      # 👇 关键魔法就在这一步
+      - name: Rename worker to edgegate (CI only)
+        run: |
+          echo "Before:"
+          cat wrangler.toml
+          sed -i 's/^name = .*/name = "edgegate"/' wrangler.toml
+          echo "After:"
+          cat wrangler.toml
 
       - name: Deploy Worker
         run: wrangler deploy
