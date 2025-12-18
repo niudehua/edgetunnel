@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Checkout target repo
         uses: actions/checkout@v3
+        with:
+          path: edgetunnel
 
       - name: Sync upstream changes
         id: sync
@@ -26,6 +28,7 @@ jobs:
           target_sync_branch: main
           target_repo_token: ${{ secrets.GITHUB_TOKEN }}
           test_mode: false
+          fork_path: edgetunnel
 
       - name: Sync check
         if: failure()
@@ -42,15 +45,19 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
+        with:
+          path: edgetunnel
 
       - name: Install dependencies
         run: npm install
+        working-directory: edgetunnel
 
       - name: Build edgetunnel pages
         run: npm run cf-page-vless
+        working-directory: edgetunnel
         env:
           UUID: ${{ secrets.EDGETUNNEL_UUID }}
-          CF_PAGES_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}   # 可在构建中使用
+          CF_PAGES_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
       - name: Deploy to Cloudflare Pages
@@ -58,5 +65,5 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: edgetunnel                 # Cloudflare Pages 项目名
-          directory: dist/apps/cf-page-vless      # 构建输出目录
+          projectName: edgetunnel
+          directory: edgetunnel/dist/apps/cf-page-vless
