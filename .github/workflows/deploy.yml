@@ -25,11 +25,15 @@ jobs:
           echo "After:"
           cat wrangler.toml
 
-      # 👇 部署 Worker，并且设置环境变量，包括 ADMIN 和 UUID
+      # 👇 设置 Secrets 在 Cloudflare 上
+      - name: Set Admin Secret in Cloudflare
+        run: |
+          wrangler secret put ADMIN --env production --text ${{ secrets.ADMIN_VALUE }}
+          wrangler secret put UUID --env production --text ${{ secrets.EDGETUNNEL_UUID }}
+
+      # 👇 部署 Worker
       - name: Deploy Worker
         run: wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          UUID: ${{ secrets.EDGETUNNEL_UUID }}
-          ADMIN: ${{ secrets.ADMIN_VALUE }}  # 添加 ADMIN 环境变量
