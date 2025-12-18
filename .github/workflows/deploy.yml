@@ -10,13 +10,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # 1️⃣ 检出代码
       - name: Checkout
         uses: actions/checkout@v3
 
+      # 2️⃣ 安装 Wrangler
       - name: Install Wrangler
         run: npm install -g wrangler
 
-      # 👇 临时改名为 edgegate（CI 内生效）
+      # 3️⃣ 修改 Worker 名字
       - name: Rename worker to edgegate (CI only)
         run: |
           echo "Before:"
@@ -25,13 +27,16 @@ jobs:
           echo "After:"
           cat wrangler.toml
 
-      # 👇 设置 Secrets 在 Cloudflare 上
-      - name: Set Admin Secret in Cloudflare
+      # 4️⃣ 注入 Cloudflare secret
+      - name: Inject Cloudflare secrets
         run: |
-          wrangler secret put ADMIN --env production --text ${{ secrets.ADMIN_VALUE }}
-          wrangler secret put UUID --env production --text ${{ secrets.EDGETUNNEL_UUID }}
+          echo "${{ secrets.ADMIN_VALUE }}" | wrangler secret put ADMIN
+          echo "${{ secrets.EDGETUNNEL_UUID }}" | wrangler secret put UUID
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
-      # 👇 部署 Worker
+      # 5️⃣ 部署 Worker
       - name: Deploy Worker
         run: wrangler deploy
         env:
