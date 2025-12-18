@@ -1,21 +1,24 @@
-name: Deploy to Cloudflare Workers
+name: Deploy edgetunnel to Cloudflare Workers
 
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: install wrangler
+      - name: Install Wrangler
         run: npm install -g wrangler
 
-      - name: publish
-        run: wrangler publish
+      - name: Deploy Worker
+        run: wrangler deploy
         env:
-          CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CF_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          UUID: ${{ secrets.EDGETUNNEL_UUID }}
